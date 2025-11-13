@@ -1,17 +1,7 @@
 ---
 import '../styles/tailwind.css';
-import capitulos from '../data/capitulos';
 import Navbar from '../components/Navbar.astro';
 import Footer from '../components/Footer.astro';
-
-const url = Astro.url;
-const path = url.pathname;
-const match = path.match(/^\/capitulos\/(.+)$/);
-const currentChapterId = match?.[1] ?? null;
-const firstChapter = capitulos[0]?.id ?? 'introduccion';
-const hrefCapitulos = `/capitulos/${currentChapterId ?? firstChapter}`;
-const isHome = path === '/';
-const isCapitulos = !!match;
 ---
 <!doctype html>
 <html lang="es" class="scroll-smooth">
