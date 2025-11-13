@@ -1,11 +1,12 @@
 ---
-import capitulos from '../data/capitulos';
+import { getChapters } from '../lib/api'
 
 const path = Astro.url.pathname;
 const match = path.match(/^\/capitulos\/(.+)$/);
-const currentChapterId = match?.[1] ?? null;
-const firstChapter = capitulos[0]?.id ?? 'introduccion';
-const hrefCapitulos = `/capitulos/${currentChapterId ?? firstChapter}`;
+
+const capitulos = await getChapters()
+const firstChapter = capitulos[0]?.slug;
+const hrefCapitulos = `/capitulos/${firstChapter}`;
 const isHome = path === '/';
 const isCapitulos = !!match;
 ---

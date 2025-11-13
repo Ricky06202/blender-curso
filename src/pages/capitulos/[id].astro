@@ -1,16 +1,27 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import capitulos from '../../data/capitulos';
+import { getChapters, getChapterById, type Chapter } from '../../lib/api';
 
-export function getStaticPaths() {
-  return capitulos.map((c) => ({ params: { id: c.id } }));
+export async function getStaticPaths() {
+  const capitulos = await getChapters();
+  return capitulos.map((c) => ({
+    params: { id: c.slug },
+    props: { capitulos },
+  }));
 }
 
 const { id } = Astro.params;
-const cap = capitulos.find((c) => c.id === id);
+const capitulos = (await Astro.props.capitulos) || [];
+const chapterSlug = id;
+const cap = capitulos.find((c: Chapter) => c.slug === chapterSlug) || 
+  await getChapterById(chapterSlug).catch(() => null);
 
 if (!cap) {
-  return Astro.redirect(`/capitulos/${capitulos[0].id}`);
+  const firstChapter = capitulos[0];
+  if (firstChapter) {
+    return Astro.redirect(`/capitulos/${firstChapter.id}`);
+  }
+  return Astro.redirect('/404');
 }
 ---
 
@@ -22,7 +33,12 @@ if (!cap) {
         <ol class="m-0 pl-4 grid gap-1">
           {capitulos.map((c) => (
             <li>
-              <a class={`hover:underline ${c.id === id ? 'font-semibold text-indigo-700' : 'text-slate-900'}`} href={`/capitulos/${c.id}#top`}>{c.titulo}</a>
+              <a 
+                class={`hover:underline ${c.id === Number(id) ? 'font-semibold text-indigo-700' : 'text-slate-900'}`} 
+                href={`/capitulos/${c.slug}#top`}
+              >
+                {c.title}
+              </a>
             </li>
           ))}
         </ol>
@@ -31,15 +47,15 @@ if (!cap) {
 
     <main class="">
       <section class="bg-white border border-slate-200 rounded-xl px-4">
-        <h2 class="m-0 mb-1 text-2xl font-semibold">{cap.titulo}</h2>
-        <p class="m-0 mb-4 text-slate-600">{cap.resumen}</p>
+        <h2 class="m-0 mb-1 text-2xl font-semibold">{cap?.title}</h2>
+        <p class="m-0 mb-4 text-slate-600">{cap?.description}</p>
 
-        {cap.videoUrl && (
+        {cap?.videoUrl && (
           <div class="aspect-video w-full overflow-hidden rounded-lg border border-slate-200 mb-4 bg-black/5">
             <iframe
               class="w-full h-full"
-              src={cap.videoUrl}
-              title={cap.titulo}
+              src={cap?.videoUrl}
+              title={cap?.title}
               frameborder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               allowfullscreen
