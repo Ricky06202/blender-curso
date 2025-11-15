@@ -1,48 +1,42 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import { getChapters, getChapterById, type Chapter } from '../../lib/api';
+import Layout from '../../layouts/Layout.astro'
+import { getChapters, getChapterById, type Chapter } from '../../lib/api'
+import ChapterProgress from '../../components/ChapterProgress.tsx'
 
 export async function getStaticPaths() {
-  const capitulos = await getChapters();
+  const capitulos = await getChapters()
   return capitulos.map((c) => ({
     params: { id: c.slug },
     props: { capitulos },
-  }));
+  }))
 }
 
-const { id } = Astro.params;
-const capitulos = (await Astro.props.capitulos) || [];
-const chapterSlug = id;
-const cap = capitulos.find((c: Chapter) => c.slug === chapterSlug) || 
-  await getChapterById(chapterSlug).catch(() => null);
+const { id } = Astro.params
+const capitulos = (await Astro.props.capitulos) || []
+const chapterSlug = id
+const cap =
+  capitulos.find((c: Chapter) => c.slug === chapterSlug) ||
+  (await getChapterById(chapterSlug).catch(() => null))
 
 if (!cap) {
-  const firstChapter = capitulos[0];
+  const firstChapter = capitulos[0]
   if (firstChapter) {
-    return Astro.redirect(`/capitulos/${firstChapter.id}`);
+    return Astro.redirect(`/capitulos/${firstChapter.id}`)
   }
-  return Astro.redirect('/404');
+  return Astro.redirect('/404')
 }
 ---
 
 <Layout>
-  <div id="top" class="grid grid-cols-1 md:grid-cols-[280px_1fr] gap-4 max-w-[1200px] mx-auto p-4 items-start">
-    <aside class="md:sticky md:top-0 self-start p-4 pr-3 border-r border-slate-200 bg-white">
+  <div
+    id="top"
+    class="grid grid-cols-1 md:grid-cols-[280px_1fr] gap-4 max-w-[1200px] mx-auto p-4 items-start"
+  >
+    <aside
+      class="md:sticky md:top-0 self-start p-4 pr-3 border-r border-slate-200 bg-white"
+    >
       <h1 class="text-lg font-medium m-0 mb-2">Capítulos</h1>
-      <nav>
-        <ol class="m-0 pl-4 grid gap-1">
-          {capitulos.map((c) => (
-            <li>
-              <a 
-                class={`hover:underline ${c.id === Number(id) ? 'font-semibold text-indigo-700' : 'text-slate-900'}`} 
-                href={`/capitulos/${c.slug}#top`}
-              >
-                {c.title}
-              </a>
-            </li>
-          ))}
-        </ol>
-      </nav>
+      <ChapterProgress client:load chapters={capitulos} currentChapterId={cap.id} />
     </aside>
 
     <main class="">
@@ -50,24 +44,20 @@ if (!cap) {
         <h2 class="m-0 mb-1 text-2xl font-semibold">{cap?.title}</h2>
         <p class="m-0 mb-4 text-slate-600">{cap?.description}</p>
 
-        {cap?.videoUrl && (
-          <div class="aspect-video w-full overflow-hidden rounded-lg border border-slate-200 bg-black/5">
-            <iframe
-              class="w-full h-full"
-              src={cap?.videoUrl}
-              title={cap?.title}
-              frameborder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowfullscreen
-            />
-          </div>
-        )}
-
-        <div class="flex gap-2">
-          <a class="inline-block px-3 py-2 rounded-md border border-slate-300 bg-white text-slate-900 hover:bg-slate-100 transition" href="#">Marcar como completado</a>
-          <a class="inline-block px-3 py-2 rounded-md border border-slate-300 bg-white text-slate-900 hover:bg-slate-100 transition" href="/auth/login">Iniciar sesión</a>
-          <a class="inline-block px-3 py-2 rounded-md border border-slate-300 bg-transparent text-slate-900 hover:bg-slate-50 transition" href="#top">Volver arriba</a>
-        </div>
+        {
+          cap?.videoUrl && (
+            <div class="aspect-video w-full overflow-hidden rounded-lg border border-slate-200 bg-black/5">
+              <iframe
+                class="w-full h-full"
+                src={cap?.videoUrl}
+                title={cap?.title}
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowfullscreen
+              />
+            </div>
+          )
+        }
       </section>
     </main>
   </div>
