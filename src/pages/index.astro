@@ -9,6 +9,33 @@ const firstChapterhref = `/capitulos/${firstChapterId}`
 ---
 
 <Layout>
+  <script>
+    // Process Google OAuth callback
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const token = urlParams.get('token');
+      const userParam = urlParams.get('user');
+      
+      if (token && userParam) {
+        try {
+          // Parse user data from URL parameter
+          const user = JSON.parse(decodeURIComponent(userParam));
+          
+          // Save to localStorage
+          localStorage.setItem('token', token);
+          localStorage.setItem('user', JSON.stringify(user));
+          
+          // Clear URL parameters
+          window.history.replaceState({}, document.title, window.location.pathname);
+          
+          // Reload to trigger Navbar update
+          window.location.reload();
+        } catch (error) {
+          console.error('Error processing OAuth callback:', error);
+        }
+      }
+    });
+  </script>
   <section class="grid place-items-center px-5 pt-24 pb-12 bg-linear-to-b from-white to-slate-50">
     <div class="max-w-[900px] text-center">
       <h1 class="text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight mb-3">Blender: de cero a render</h1>
@@ -18,7 +45,7 @@ const firstChapterhref = `/capitulos/${firstChapterId}`
       </p>
       <div class="inline-flex gap-3 flex-wrap justify-center">
         <a class="inline-block px-4 py-2 rounded-md text-white bg-indigo-600 border border-indigo-600 shadow-[0_6px_20px_-8px_rgb(79_70_229)] hover:bg-indigo-700 transition" href={firstChapterhref} aria-label="Empezar ahora">Empezar ahora</a>
-        <a class="inline-block px-4 py-2 rounded-md border border-slate-300 bg-white text-slate-900 hover:bg-slate-100 transition" href="#" aria-label="Iniciar sesión">Iniciar sesión</a>
+        <a class="inline-block px-4 py-2 rounded-md border border-slate-300 bg-white text-slate-900 hover:bg-slate-100 transition" href="/auth/login" aria-label="Iniciar sesión">Iniciar sesión</a>
       </div>
     </div>
   </section>
