@@ -2,15 +2,19 @@
 import '../styles/tailwind.css';
 import Navbar from '../components/Navbar.tsx';
 import Footer from '../components/Footer.astro';
+import BlenderLogo from '../assets/BlenderLogo.png';
 ---
 <!doctype html>
 <html lang="es" class="scroll-smooth">
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" type="image/png" href="/favicon.png" />
 		<meta name="generator" content={Astro.generator} />
 		<title>Blender: de cero a render</title>
+		<meta property="og:image" content={BlenderLogo.src} />
+		<meta property="og:title" content="Blender: de cero a render" />
+		<meta property="og:description" content="Aprende Blender desde cero hasta crear renders profesionales" />
 	</head>
 	<body class="min-h-screen flex flex-col bg-slate-50 text-slate-900">
 		<Navbar client:only />
